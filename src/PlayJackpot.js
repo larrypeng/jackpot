@@ -34,6 +34,8 @@ class PlayJackpot extends Component {
 
         //Bind the events
         this.roll = this.roll.bind(this);
+        this.updateCredit = this.updateCredit.bind(this);
+        this.updateBlocks = this.updateBlocks.bind(this);
         //this.randSymbol = this.randSymbol.bind(this);
     }
 
@@ -44,17 +46,18 @@ class PlayJackpot extends Component {
             //Make a copy of the block object with symbol -> new random symbol
             return {...block, symbol: this.randSymbol()};
         });
+
         //Testing...
         console.log(newBlocks);
 
-        //Update the state vars to the new array
+        //Adjust the blocks by updating the state vars to the new array
         this.setState({
             blocks: newBlocks
         });
+        //this.updateBlocks(newBlocks); 
 
-        // setTimeout(() => {
-        //     this.setState({isRolling: false}) 
-        // }, 1000);
+        //Adjust the session credit
+        this.setState(this.updateCredit);
         
     }
 
@@ -62,13 +65,38 @@ class PlayJackpot extends Component {
     randSymbol(){
         return this.props.symbols[Math.floor(Math.random() * this.props.symbols.length)]['name'];
     }
-
+      
     //Define a helper function to determine if it is a win or a lose
+    updateBlocks(newBlocks){
+        //return {blocks: newBlocks};
+        // setTimeout(() => {
+        //     this.setState({isRolling: false}) 
+        // }, 1000);
+        let timer = 0;
+        newBlocks.map((block, index) =>{            
+            timer += 1000;
+            //console.log(timer);
+            setTimeout(() => {
+              console.log(block); 
+              console.log(this.state.blocks[index]);
+              //this.setState({blocks: newBlocks});
+              this.setState(curState => ({
+                  //blocks[index]: curState.blocks
+              }))
+            }, timer);
+        });
 
+        //const new
+
+
+ 
+
+
+    }
 
     //Define a updateCredit method to adjust session credit after each roll
-    updateCredit(){
-
+    updateCredit(prevState){
+        return { balance: prevState.balance - 1 };
     }
 
     //Define a cashout method to transfer credits to bank
