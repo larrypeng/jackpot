@@ -1,0 +1,32 @@
+.PlayJackpot {
+  display: flex;
+  flex-flow: column nowrap;
+  min-height: 100vh;
+}
+
+.PlayJackpot-balance {
+  align-self: center;
+}
+
+.PlayJackpot-balance table th {
+  padding: 1em;
+  color: white;
+  background-color: rgb(206, 58, 66);
+}
+
+.PlayJackpot-btns button {
+  margin: 1em;
+  align-self: center;
+  width: 15em;
+  padding: 1.5em;
+  border: 0px;
+  border-radius: 10px;
+  color: white;
+  background-color: rgb(206, 58, 66);
+  margin-top: 3em;
+}
+
+.PlayJackpot-btns button:hover {
+  background-color: tomato;
+  cursor: pointer;
+}
