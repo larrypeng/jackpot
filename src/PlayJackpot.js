@@ -6,10 +6,10 @@ class PlayJackpot extends Component {
     //Define the default immutable props - four block symbols
     static defaultProps = {
         symbols: [
-            {name: 'salad', credit: 10},
+            {name: 'cherry', credit: 10},
             {name: 'lemon', credit: 20},
-            {name: 'pumpkin', credit: 30},
-            {name: 'carrot', credit: 40}
+            {name: 'orange', credit: 30},
+            {name: 'watermelon', credit: 40}
         ]
     }
 
@@ -23,9 +23,10 @@ class PlayJackpot extends Component {
         */
         this.state = {
             blocks: [
-                {id:1, symbol: 'carrot'}, 
+                {id:1, symbol: 'cherry'}, 
                 {id:2, symbol: 'lemon'}, 
-                {id:3, symbol: 'pumpkin'}
+                {id:3, symbol: 'orange'},
+                // {id:4, symbol: 'watermelon'}
             ], 
             isRolling: false,
             balance: 10
@@ -36,7 +37,12 @@ class PlayJackpot extends Component {
         this.roll = this.roll.bind(this);
         this.updateCredit = this.updateCredit.bind(this);
         this.updateBlocks = this.updateBlocks.bind(this);
-        //this.randSymbol = this.randSymbol.bind(this);
+    }
+
+    //Connect to backend logic to query and update Bank Total
+    componentDidMount(){
+        //load session data, and set state data
+
     }
 
     //Define a roll method to change Block state
@@ -52,12 +58,18 @@ class PlayJackpot extends Component {
 
         //Adjust the blocks by updating the state vars to the new array
         this.setState({
-            blocks: newBlocks
+            blocks: newBlocks, 
+            isRolling: true
         });
         //this.updateBlocks(newBlocks); 
 
         //Adjust the session credit
         this.setState(this.updateCredit);
+
+        //Reset rolling state to false
+        setTimeout(() => {
+            this.setState({isRolling: false}) 
+        }, 1000);
         
     }
 
@@ -68,10 +80,7 @@ class PlayJackpot extends Component {
       
     //Define a helper function to determine if it is a win or a lose
     updateBlocks(newBlocks){
-        //return {blocks: newBlocks};
-        // setTimeout(() => {
-        //     this.setState({isRolling: false}) 
-        // }, 1000);
+        //Set up a timer for each block
         let timer = 0;
         newBlocks.map((block, index) =>{            
             timer += 1000;
@@ -85,13 +94,6 @@ class PlayJackpot extends Component {
               }))
             }, timer);
         });
-
-        //const new
-
-
- 
-
-
     }
 
     //Define a updateCredit method to adjust session credit after each roll
@@ -122,11 +124,15 @@ class PlayJackpot extends Component {
                     </table>
 
                 </div>
-                <div className='PlayJackpot-Block'>
+                <div className='PlayJackpot-Blocks'>
                     {/* Render all blocks */}
+                    <table>
+                    <tr>
                     {this.state.blocks.map ( b => 
-                        <Block {...b} />
+                        <td><Block {...b} key={b.id} rolling={this.state.isRolling} /></td>
                     )}
+                    </tr>
+                    </table>
                 </div>
                 <div className='PlayJackpot-btns'>
                     <button onClick={this.roll} disabled={this.state.isRolling}>

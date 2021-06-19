@@ -1,5 +1,10 @@
-i.Block {
+.Block {
   font-size: 10em;
   padding: 0.25em;
   color: chartreuse;
+}
+
+.Block-symbol {
+  width: 200px;
+  height: auto;
 }

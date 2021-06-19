@@ -4,6 +4,10 @@
   min-height: 100vh;
 }
 
+.PlayJackpot-Blocks {
+  margin: 0 auto;
+}
+
 .PlayJackpot-balance {
   align-self: center;
 }
