@@ -13,7 +13,7 @@
 }
 
 .PlayJackpot-balance table th {
-  padding: 1em;
+  padding: 0.5em 1em 0.5em 1em;
   color: white;
   background-color: rgb(206, 58, 66);
 }
