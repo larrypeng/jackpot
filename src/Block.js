@@ -2,6 +2,14 @@ import React, {Component} from 'react';
 import './Block.css'
 
 class Block extends Component {
+
+    // componentDidMount(){
+    //     //load session data, and set state data
+    //     console.log("after rendering >>");
+    //     console.log(this.props.symbol);
+
+    // }
+
     render (){
         return (
             <div>

@@ -1,5 +1,6 @@
 import react, {Component} from 'react';
 import Block from './Block.js';
+import Message from './Message.js';
 import './PlayJackpot.css'
 
 /* Look into sessionStorage */
@@ -30,36 +31,41 @@ class PlayJackpot extends Component {
                 {id:3, symbol: 'orange', rolling: false},
             ], 
             isRolling: false,
-            balance: 10
+            balance: 10,
+            message: 'Welcome to Jackpot!'
             
         };
 
         //Bind the events
         this.roll = this.roll.bind(this);
-        this.updateCredit = this.updateCredit.bind(this);
+        this.reduceCreditByOne = this.reduceCreditByOne.bind(this);
         this.updateBlocks = this.updateBlocks.bind(this);
     }
 
-    //Ajax: Connect to backend logic to query and update Bank Total
-    componentDidMount(){
-        //load session data, and set state data
-
-    }
     //Define a roll method to change Block state
     roll(){
-        //Generate random symbol for all blocks
-        this.updateBlocks();
-        
-        //Update global rolling status
-        this.setState({isRolling: true});
+        if(this.state.balance > 0) {
+            //Generate random symbol for all blocks
+            this.updateBlocks();
 
-        //Adjust the session credit
-        this.setState(this.updateCredit);
+            //Update global rolling status
+            this.setState({isRolling: true});
 
-        //Resetting rolling state to false after the last block stops rolling
-        setTimeout(() => {
-            this.setState({isRolling: false}) 
-        }, this.state.blocks.length * 1000);
+            //Reduce session credit by 1
+            this.setState(this.reduceCreditByOne);
+
+            //Resetting rolling state to false after the last block stops rolling
+            setTimeout(() => {
+                this.setState({isRolling: false});
+                //console.log(this.state.blocks); 
+                
+                //Get the results for this round
+                this.updateCredit();
+
+            }, this.state.blocks.length * 1000);
+        } else {
+            this.setState({message: 'Game Over!'});
+        }
         
     }
     //Define a function to update Blocks progressively
@@ -80,6 +86,7 @@ class PlayJackpot extends Component {
                 let blocks = [...this.state.blocks];
                 //2. Make a shallow copy of the current block, and replace the value for "symbol" key 
                 let block = {...blocks[i], symbol : this.randSymbol(), rolling : false}; 
+                //let block = {...blocks[i], symbol : 'orange', rolling : false}; 
                 //3. Move the array element back to "blocks" array
                 blocks[i] = block;
                 //4. Set the state to the new copy
@@ -89,14 +96,37 @@ class PlayJackpot extends Component {
        }
             
     }
-    //Define a helper function to get the symbol randomly
+    //Generate a random symbol for a block
     randSymbol(){
         return this.props.symbols[Math.floor(Math.random() * this.props.symbols.length)]['name'];
     }
 
-    //Define a updateCredit method to adjust session credit after each roll
-    updateCredit(prevState){
+    //Adjust session credit after each roll
+    reduceCreditByOne(prevState){
         return { balance: prevState.balance - 1 };
+    }
+
+    //Compare block symbols and update the session total
+    updateCredit(){
+        //Extract the "symbol" property from Blocks object, and assign it to an array
+        const symbols = [...this.state.blocks].reduce((result, ele) => {
+            return [...result, ele.symbol];
+        }, []);
+        console.log(symbols);
+        console.log(new Set(symbols));
+        //If the array contains three identical values, we have a win
+        const isAWin = (new Set(symbols).size === 1);
+        console.log(isAWin);
+        if (isAWin) {
+            //this.setState(this.increaseCredit(prevState, this.symbols[0].credit));          
+            //Search default props for the symbol credit, when it is a win
+            const Symbol_obj = this.props.symbols.find(s => s.name === symbols[0]);
+            const score = Symbol_obj.credit;
+            console.log('score: ' + score);
+            //Update the Session Total by adding the credit earned from this round, update message board
+            this.setState(curState => ({balance: curState.balance + score, message: `You Win! (+ ${score} credits)`}));
+        }
+   
     }
 
     //Define a cashout method to transfer credits to bank
@@ -108,6 +138,7 @@ class PlayJackpot extends Component {
     render(){
         return (
             <div className='PlayJackpot'>
+                <Message msg={this.state.message}/>
                 <div className='PlayJackpot-balance'>
                     <table>
                         <thead>
