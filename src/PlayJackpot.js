@@ -32,7 +32,10 @@ class PlayJackpot extends Component {
             ], 
             isRolling: false,
             balance: 10,
-            message: 'Welcome to Jackpot!'
+            message: 'Welcome to Jackpot!',
+            isCashoutHovered: false,
+            isCashoutUnClickable: false,
+            cashoutHoverClass: ''
             
         };
 
@@ -40,6 +43,8 @@ class PlayJackpot extends Component {
         this.roll = this.roll.bind(this);
         this.reduceCreditByOne = this.reduceCreditByOne.bind(this);
         this.updateBlocks = this.updateBlocks.bind(this);
+        this.hoverCashout = this.hoverCashout.bind(this);
+        this.leaveCashout = this.leaveCashout.bind(this);
     }
 
     //Define a roll method to change Block state
@@ -129,6 +134,50 @@ class PlayJackpot extends Component {
    
     }
 
+    //Hovering event on Cashout button
+    hoverCashout(){
+        let randNum = Math.random();
+        const directions = ['goup', 'godown','goright'];
+        //50% chance that Cashout btn moves to a random location
+        if (randNum < 0.5) {
+            //50% chance of being here. Move the btn to random direction
+            console.log("jumping");
+            let randDirection = directions[Math.floor(Math.random() * directions.length)];
+            this.setState(prevState => ({
+                isCashoutHovered: !prevState.isCashoutHovered,
+                cashoutHoverClass: randDirection
+            }));
+            //console.log(this.state.isCashoutHovered);
+            //After 5 seconds, put back the Cashout button
+            setTimeout(() => {
+                this.setState(prevState => ({
+                    isCashoutHovered: !prevState.isCashoutHovered
+                }));
+            }, 5000);
+
+        } else if (randNum < 0.9) {
+            console.log("unclickable");
+            //40% chance of being here. Render the btn unclickable
+            this.setState(prevState => ({
+                isCashoutUnClickable: !prevState.isCashoutUnClickable,
+            }));
+
+        } else {
+            //10% chance of being here. Successful cashout
+            console.log("hovering");
+        }
+
+    }
+    //Define a function to undo hovering effect
+    leaveCashout(){
+        console.log(this.state.isCashoutUnClickable);
+        if (this.state.isCashoutUnClickable === true){
+            this.setState(prevState => ({
+                isCashoutUnClickable: !prevState.isCashoutUnClickable
+            }));
+        }
+    }
+
     //Define a cashout method to transfer credits to bank
     cashout(){
 
@@ -136,6 +185,7 @@ class PlayJackpot extends Component {
 
     //Render the UI, layout parent and children UI components
     render(){
+        //const cashoutClass = ;
         return (
             <div className='PlayJackpot'>
                 <Message msg={this.state.message}/>
@@ -165,8 +215,19 @@ class PlayJackpot extends Component {
                     <button onClick={this.roll} disabled={this.state.isRolling}>
                         { (this.state.isRolling) ? 'Rolling...' : 'Play the game' }
                     </button>
-
-                    <button onClick={this.cashout} disabled={this.state.isRolling}>Cash Out</button>
+                   
+                    <button onClick={this.cashout} 
+                            onMouseEnter={this.hoverCashout}
+                            onPointerLeave={this.leaveCashout}
+                            disabled={this.state.isRolling || this.state.isCashoutUnClickable}                           
+                            className={
+                                (this.state.isCashoutHovered) ? 
+                                `cashout_${this.state.cashoutHoverClass}`:
+                                ''
+                                }
+                            >
+                        Cash Out
+                    </button>
                 </div>
             </div>
 

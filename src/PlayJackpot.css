@@ -39,3 +39,18 @@
   background-color: tomato;
   cursor: pointer;
 }
+
+.cashout_godown {
+  position: relative;
+  top: 300px;
+}
+
+.cashout_goright {
+  position: relative;
+  left: 300px;
+}
+
+.cashout_goup {
+  position: relative;
+  bottom: 300px;
+}
