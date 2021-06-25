@@ -35,7 +35,8 @@ class PlayJackpot extends Component {
             message: 'Welcome to Jackpot!',
             isCashoutHovered: false,
             isCashoutUnClickable: false,
-            cashoutHoverClass: ''
+            cashoutHoverClass: '',
+            justWon: false
             
         };
 
@@ -49,11 +50,12 @@ class PlayJackpot extends Component {
 
     //Define a roll method to change Block state
     roll(){
+        //Roll only works when balance > 0
         if(this.state.balance > 0) {
             //Generate random symbol for all blocks
             this.updateBlocks();
 
-            //Update global rolling status
+            //Update global rolling status, only controlling the "Play the game" button
             this.setState({isRolling: true});
 
             //Reduce session credit by 1
@@ -61,45 +63,90 @@ class PlayJackpot extends Component {
 
             //Resetting rolling state to false after the last block stops rolling
             setTimeout(() => {
+                //Reenable Play button
                 this.setState({isRolling: false});
-                //console.log(this.state.blocks); 
-                
-                //Get the results for this round
+                //Because the result can be cheated, we calculate the credits at the very end
                 this.updateCredit();
 
             }, this.state.blocks.length * 1000);
-        } else {
+        } 
+        //0 balance, Game Over
+        else {
             this.setState({message: 'Game Over!'});
         }
         
     }
+    //Get 3 random symbols
+    getRandSymbols(){
+        return this.state.blocks.map(block => {
+            //Make a copy of the block object with symbol -> new random symbol
+            return {...block, symbol: this.randSymbol()};
+            //return {...block, symbol: 'watermelon'};
+        });
+    }
+    //Return genuine random symbols or manipulated ones
+    applyCheating(){
+        const newBlockSymbols = this.getRandSymbols();
+        const arrayToCheck = [...newBlockSymbols].reduce((result, ele) => {
+            return [...result, ele.symbol];
+            //return [...result, 'cherry'];
+        }, []);
+        const isAllSame = (new Set(arrayToCheck).size === 1);
+
+        //Here is the cheating
+        if (isAllSame){
+            //Balance 0-40, truly random
+            if (this.state.balance < 40) {
+                return newBlockSymbols;
+            }
+            //Balance 40-60, slight cheat       
+            else if (this.state.balance >= 40 && this.state.balance <= 60){
+                //30% chance of rerolling if it is a win and has 40 ~ 60 credits
+                return (Math.random() < 0.3) ? this.getRandSymbols() : newBlockSymbols;
+            } 
+            //Balance > 60, big cheat
+            else if (this.state.balance > 60) {
+                //60% chance of rerolling if it is a win and has > 60 credits
+                return (Math.random() < 0.6) ? this.getRandSymbols() : newBlockSymbols;
+            } 
+        } 
+        //Symbols are not the same, so we don't cheat at all
+        else {
+            return newBlockSymbols;
+        }
+       
+    }
+
     //Define a function to update Blocks progressively
     updateBlocks(){
-        //Update rolling status for all blocks to true
-        const newBlocks = this.state.blocks.map(block => {
-            //Make a copy of the block object with symbol -> new random symbol
-            return {...block, rolling: true};
-        });
-        this.setState({blocks: newBlocks});
+            //Update rolling status for all blocks to true
+            const newBlocks = this.state.blocks.map(block => {
+                //Make a copy of the block object with symbol -> new random symbol
+                return {...block, rolling: true};
+            });
+            this.setState({blocks: newBlocks});
 
-        //Loop through blocks to create random symbol and update state accordingly
-        //Blocks are updated at 1 sec, 2 sec and 3 sec consecutively
-        for (let i = 0 ; i < this.state.blocks.length; i++){
-            setTimeout(() => {
-                //console.log("before change: " + this.state.blocks[i].symbol);
-                //1. Make a shallow copy of the blocks
-                let blocks = [...this.state.blocks];
-                //2. Make a shallow copy of the current block, and replace the value for "symbol" key 
-                let block = {...blocks[i], symbol : this.randSymbol(), rolling : false}; 
-                //let block = {...blocks[i], symbol : 'orange', rolling : false}; 
-                //3. Move the array element back to "blocks" array
-                blocks[i] = block;
-                //4. Set the state to the new copy
-                this.setState({blocks});  
-                //console.log("after change: " + this.state.blocks[i].symbol);
-            }, (i + 1) * 1000);
-       }
-            
+            //Create random symbols with potential cheating based on credits
+            const newBlockSymbols = this.applyCheating();
+            console.log(newBlockSymbols);
+
+            //After some shuffling plus cheating, we finally bring everything to front  
+            for (const [i, item] of newBlockSymbols.entries()) {
+                //console.log(item);
+                //Blocks are updated at 1 sec, 2 sec and 3 sec consecutively
+                setTimeout(() => {
+                    //1. Make a shallow copy of the blocks
+                    let blocks = [...this.state.blocks];
+                    //2. Make a shallow copy of the current block, and replace the value for "symbol" key 
+                    let block = {...blocks[i], symbol : item.symbol, rolling : false};  
+                    //3. Move the array element back to "blocks" array
+                    blocks[i] = block;
+                    //4. Set the state to the new copy
+                    this.setState({blocks});  
+
+                }, (i + 1) * 1000);
+
+            }              
     }
     //Generate a random symbol for a block
     randSymbol(){
@@ -117,17 +164,16 @@ class PlayJackpot extends Component {
         const symbols = [...this.state.blocks].reduce((result, ele) => {
             return [...result, ele.symbol];
         }, []);
-        console.log(symbols);
-        console.log(new Set(symbols));
+        //console.log(symbols);
         //If the array contains three identical values, we have a win
         const isAWin = (new Set(symbols).size === 1);
-        console.log(isAWin);
+        //console.log(isAWin);
         if (isAWin) {
             //this.setState(this.increaseCredit(prevState, this.symbols[0].credit));          
             //Search default props for the symbol credit, when it is a win
             const Symbol_obj = this.props.symbols.find(s => s.name === symbols[0]);
             const score = Symbol_obj.credit;
-            console.log('score: ' + score);
+            //console.log('score: ' + score);
             //Update the Session Total by adding the credit earned from this round, update message board
             this.setState(curState => ({balance: curState.balance + score, message: `You Win! (+ ${score} credits)`}));
         }
@@ -163,7 +209,7 @@ class PlayJackpot extends Component {
             }));
 
         } else {
-            //10% chance of being here. Successful cashout
+            //10% chance of being here. Click will cashout
             console.log("hovering");
         }
 
@@ -180,7 +226,7 @@ class PlayJackpot extends Component {
 
     //Define a cashout method to transfer credits to bank
     cashout(){
-
+        console.log("Cashing out...");
     }
 
     //Render the UI, layout parent and children UI components
@@ -215,10 +261,11 @@ class PlayJackpot extends Component {
                     <button onClick={this.roll} disabled={this.state.isRolling}>
                         { (this.state.isRolling) ? 'Rolling...' : 'Play the game' }
                     </button>
-                   
+                    
                     <button onClick={this.cashout} 
                             onMouseEnter={this.hoverCashout}
-                            onPointerLeave={this.leaveCashout}
+                            //onMouseLeave bug: https://github.com/facebook/react/issues/18753
+                            onPointerLeave={this.leaveCashout} 
                             disabled={this.state.isRolling || this.state.isCashoutUnClickable}                           
                             className={
                                 (this.state.isCashoutHovered) ? 
