@@ -6,7 +6,12 @@ class Message extends Component {
         return (
             <div className='Message'>
                 <h3>Message Board</h3>
-                <div>{this.props.msg || 'Hi'}</div>
+                {/* <div className='Message-body '>{this.props.msg}</div> */}
+                <div className={
+                                (this.props.shakeUp) ? 
+                                'Message-body shakeUp':
+                                'Message-body'
+                                }>{this.props.msg}</div>
             </div>
         )
     }

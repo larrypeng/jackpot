@@ -1,0 +1,16 @@
+.Score {
+  right: 20px;
+  position: absolute;
+  margin: 1em;
+  width: 15em;
+  padding: 1.5em;
+  border: 0px;
+  border-radius: 10px;
+  color: white;
+  background-color: rgb(206, 58, 66);
+  margin-top: 3em;
+}
+.Score-symbol {
+  width: 50px;
+  height: auto;
+}

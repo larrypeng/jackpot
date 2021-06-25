@@ -1,6 +1,7 @@
 import react, {Component} from 'react';
 import Block from './Block.js';
 import Message from './Message.js';
+import Score from './Score.js';
 import './PlayJackpot.css'
 
 /* Look into sessionStorage */
@@ -32,11 +33,11 @@ class PlayJackpot extends Component {
             ], 
             isRolling: false,
             balance: 10,
-            message: 'Welcome to Jackpot!',
+            message: 'Welcome to Jackpot! Hover over or win to shake me up',
             isCashoutHovered: false,
             isCashoutUnClickable: false,
             cashoutHoverClass: '',
-            justWon: false
+            shakeUp: false
             
         };
 
@@ -93,7 +94,7 @@ class PlayJackpot extends Component {
         }, []);
         const isAllSame = (new Set(arrayToCheck).size === 1);
 
-        //Here is the cheating
+        //If it is a win, here is how we cheat
         if (isAllSame){
             //Balance 0-40, truly random
             if (this.state.balance < 40) {
@@ -139,6 +140,7 @@ class PlayJackpot extends Component {
                     let blocks = [...this.state.blocks];
                     //2. Make a shallow copy of the current block, and replace the value for "symbol" key 
                     let block = {...blocks[i], symbol : item.symbol, rolling : false};  
+                    //let block = {...blocks[i], symbol : 'cherry', rolling : false};  
                     //3. Move the array element back to "blocks" array
                     blocks[i] = block;
                     //4. Set the state to the new copy
@@ -175,7 +177,7 @@ class PlayJackpot extends Component {
             const score = Symbol_obj.credit;
             //console.log('score: ' + score);
             //Update the Session Total by adding the credit earned from this round, update message board
-            this.setState(curState => ({balance: curState.balance + score, message: `You Win! (+ ${score} credits)`}));
+            this.setState(curState => ({balance: curState.balance + score, message: `You Win! (+ ${score} credits)`, shakeUp:true}));
         }
    
     }
@@ -223,10 +225,20 @@ class PlayJackpot extends Component {
             }));
         }
     }
-
+    handleSaveToPC = jsonData => {
+        const fileData = JSON.stringify(jsonData);
+        const blob = new Blob([fileData], {type: "text/plain"});
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = 'larry.json';
+        link.href = url;
+        link.click();
+    }
     //Define a cashout method to transfer credits to bank
     cashout(){
-        console.log("Cashing out...");
+       console.log("Cashing out...");
+       //TODO: hook up with express server to update Bank Balance 
+
     }
 
     //Render the UI, layout parent and children UI components
@@ -234,7 +246,8 @@ class PlayJackpot extends Component {
         //const cashoutClass = ;
         return (
             <div className='PlayJackpot'>
-                <Message msg={this.state.message}/>
+                <Message msg={this.state.message} shakeUp={this.state.shakeUp}/>
+                <Score />
                 <div className='PlayJackpot-balance'>
                     <table>
                         <thead>

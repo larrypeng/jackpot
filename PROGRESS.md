@@ -7,7 +7,14 @@ https://github.com/facebook/react/issues/18753
 
 SVG assets are downloaded from freesvg.org. Credit goes to this fantastic site.
 
-# TODOs
+Server with express.js
+cd jackpot/server
+npm init -y
+npm install express cors axios nodemon
+
+Need to finish the cashOut function by hooking up frontend to express server
+
+Message board shake effect: Credit goes to https://codepen.io/mcvazin/pen/bMOVPy
 
 # Future improvements
 
@@ -18,6 +25,8 @@ Use Redux to manage the state in one single store for the entire app
 Factor button group out to its own component
 
 Allow Message Board to stack up game logs with timestamp
+
+Write automated tests
 
 -------Client side-------
 Create a scoring table:
