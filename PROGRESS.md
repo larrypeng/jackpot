@@ -11,30 +11,25 @@ Server with express.js
 cd jackpot/server
 npm init -y
 npm install express cors axios nodemon
-
-Need to finish the cashOut function by hooking up frontend to express server
+More information, use README file under JACKPOT/server/README.md
 
 Message board shake effect: Credit goes to https://codepen.io/mcvazin/pen/bMOVPy
 
-# Future improvements
+# Future improvements/TODOs
 
 ------Server side-------
+
+Cashout button click event is incomplete(jumping or becoming unclickable were completed) by hooking up with express server
+
+express server can handle get/post request, but only with in-memory storage, need to develop for file/database support
+
+Frontend: need to implement logic with axios package to talk to backend to get bank balance.
 
 Use Redux to manage the state in one single store for the entire app
 
 Factor button group out to its own component
 
-Allow Message Board to stack up game logs with timestamp
-
 Write automated tests
-
--------Client side-------
-Create a scoring table:
-Symbos Credits
-3 c ---> 10
-3 l ---> 20
-3 o ---> 30
-3 w ---> 40
 
 Create truly rolling effect to blocks
 

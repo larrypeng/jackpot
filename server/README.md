@@ -7,13 +7,14 @@ nodemon index.js
 
 I used postman client to do that
 
-/post
+localhost:400/bank/
+POST:
 Header: Key: Content-Type, Value: application/json
 Body: select "raw"
 {"balance":5}
 Click Send
 
-/get
+GET:
 Header: Key: Content-Type, Value: application/json
 Output:
 {
