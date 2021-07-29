@@ -2,47 +2,31 @@ import React, {Component} from 'react';
 import './Score.css'
 
 class Score extends Component {
-    render (){
+    render(){
+        //Retrieve the symbols collection from parent
+        let symbols = this.props.symbols;
         return (
             <div className='Score'>
-                <h3>Score Board</h3>
+                <h3>Be a winner!</h3>
                 <table>
                         <thead>
                             <tr><th>Symbols</th><th>Credits</th></tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                <img src='images/cherry.svg' className='Score-symbol' alt='fruits'/>  
-                                <img src='images/cherry.svg' className='Score-symbol' alt='fruits'/>  
-                                <img src='images/cherry.svg' className='Score-symbol' alt='fruits'/>
-                                </td>
-                                <td>10</td>
-                            </tr>
-                            <tr>
-                                <td>                               
-                                <img src='images/lemon.svg' className='Score-symbol' alt='fruits'/>  
-                                <img src='images/lemon.svg' className='Score-symbol' alt='fruits'/>  
-                                <img src='images/lemon.svg' className='Score-symbol' alt='fruits'/>
-                                </td>
-                                <td>20</td>
-                            </tr>
-                            <tr>
-                                <td>                               
-                                <img src='images/orange.svg' className='Score-symbol' alt='fruits'/>  
-                                <img src='images/orange.svg' className='Score-symbol' alt='fruits'/>  
-                                <img src='images/orange.svg' className='Score-symbol' alt='fruits'/>
-                                </td>
-                                <td>30</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                <img src='images/watermelon.svg' className='Score-symbol' alt='fruits'/>  
-                                <img src='images/watermelon.svg' className='Score-symbol' alt='fruits'/>  
-                                <img src='images/watermelon.svg' className='Score-symbol' alt='fruits'/>
-                                </td>
-                                <td>40</td>
-                            </tr>
+                        <tbody>  
+                        
+                        {
+                            symbols.map(symbol => {
+                                let imgSrc = <img src={`images/${symbol.name}.svg`} className='Score-symbol' alt='fruits'/>;
+                                let i = this.props.winSize;
+                                return (
+                                    <tr>
+                                        <td>{ imgSrc }{ imgSrc }{ imgSrc }</td>
+                                        <td>{ symbol.credit }</td>
+                                    </tr>   
+                                )
+                            })
+                        }
+
                         </tbody>
                 </table>
             </div>

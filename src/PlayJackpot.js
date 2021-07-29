@@ -33,15 +33,17 @@ class PlayJackpot extends Component {
             ], 
             isRolling: false,
             balance: 10,
-            message: 'Welcome to Jackpot! Hover over or win to shake me up',
+            message: [],
             isCashoutHovered: false,
             isCashoutUnClickable: false,
-            cashoutHoverClass: '',
-            shakeUp: false
+            cashoutHoverClass: '', /* Cashout btn goes to either up, right, down */
+            shakeUp: false,
+            bankBalance: 0
+
             
         };
 
-        //Bind the events
+        //Bind the events, bind all events into one happy family
         this.roll = this.roll.bind(this);
         this.reduceCreditByOne = this.reduceCreditByOne.bind(this);
         this.updateBlocks = this.updateBlocks.bind(this);
@@ -66,6 +68,7 @@ class PlayJackpot extends Component {
             setTimeout(() => {
                 //Reenable Play button
                 this.setState({isRolling: false});
+
                 //Because the result can be cheated, we calculate the credits at the very end
                 this.updateCredit();
 
@@ -74,6 +77,8 @@ class PlayJackpot extends Component {
         //0 balance, Game Over
         else {
             this.setState({message: 'Game Over!'});
+            //this.setState({shakeUp: true});
+            this.setState(curState => ({shakeUp: !curState.shakeUp}));
         }
         
     }
@@ -156,8 +161,8 @@ class PlayJackpot extends Component {
     }
 
     //Adjust session credit after each roll
-    reduceCreditByOne(prevState){
-        return { balance: prevState.balance - 1 };
+    reduceCreditByOne(curState){
+        return { balance: curState.balance - 1 };
     }
 
     //Compare block symbols and update the session total
@@ -170,6 +175,11 @@ class PlayJackpot extends Component {
         //If the array contains three identical values, we have a win
         const isAWin = (new Set(symbols).size === 1);
         //console.log(isAWin);
+
+        //Get a timestamp appended to message?
+        let gameTime = new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+        //console.log(gameTime);
+  
         if (isAWin) {
             //this.setState(this.increaseCredit(prevState, this.symbols[0].credit));          
             //Search default props for the symbol credit, when it is a win
@@ -177,7 +187,19 @@ class PlayJackpot extends Component {
             const score = Symbol_obj.credit;
             //console.log('score: ' + score);
             //Update the Session Total by adding the credit earned from this round, update message board
-            this.setState(curState => ({balance: curState.balance + score, message: `You Win! (+ ${score} credits)`, shakeUp:true}));
+            this.setState(curState => ({
+                balance: curState.balance + score, 
+                message: [...this.state.message, `You Win! +${score} credits \u00A0\u00A0${gameTime}`], 
+                shakeUp:true
+            }));
+
+        } else {
+            //if Session credit is 0, end the game
+            let newMsg = (this.state.balance > 0) ? "Don't give up!": "Game over!";
+            this.setState(curState => ({
+                message: [...this.state.message, newMsg],
+                shakeUp:true
+            }));        
         }
    
     }
@@ -186,6 +208,7 @@ class PlayJackpot extends Component {
     hoverCashout(){
         let randNum = Math.random();
         const directions = ['goup', 'godown','goright'];
+        
         //50% chance that Cashout btn moves to a random location
         if (randNum < 0.5) {
             //50% chance of being here. Move the btn to random direction
@@ -212,7 +235,7 @@ class PlayJackpot extends Component {
 
         } else {
             //10% chance of being here. Click will cashout
-            console.log("hovering");
+            //console.log("hovering");
         }
 
     }
@@ -225,19 +248,14 @@ class PlayJackpot extends Component {
             }));
         }
     }
-    handleSaveToPC = jsonData => {
-        const fileData = JSON.stringify(jsonData);
-        const blob = new Blob([fileData], {type: "text/plain"});
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.download = 'larry.json';
-        link.href = url;
-        link.click();
-    }
-    //Define a cashout method to transfer credits to bank
-    cashout(){
-       console.log("Cashing out...");
+
+    //Define a cashout method to transfer credits to bank. How about some alternative syntax for binding
+    //Need babel to do the heavy lifting
+    cashout = () => {
+       //console.log("Cashing out...");
        //TODO: hook up with express server to update Bank Balance 
+        this.setState(curState => ({bankBalance: curState.bankBalance + curState.balance}));
+        this.setState(curState => ({balance: 0, message: 'Game over'}));
 
     }
 
@@ -246,8 +264,8 @@ class PlayJackpot extends Component {
         //const cashoutClass = ;
         return (
             <div className='PlayJackpot'>
-                <Message msg={this.state.message} shakeUp={this.state.shakeUp}/>
-                <Score />
+                <Message msgs={this.state.message} shakeUp={this.state.shakeUp}/>
+                <Score winSize={this.state.blocks.length} symbols={this.props.symbols} />
                 <div className='PlayJackpot-balance'>
                     <table>
                         <thead>
@@ -256,7 +274,7 @@ class PlayJackpot extends Component {
                         <tbody>
                             <tr>
                                 <td>{this.state.balance}</td>
-                                <td>0</td>
+                                <td>{this.state.bankBalance}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -266,7 +284,7 @@ class PlayJackpot extends Component {
                     {/* Render all blocks */}
                     <table><tbody><tr>
                         {this.state.blocks.map ( b => 
-                            <td><Block {...b} key={b.id} /></td>
+                            <td key={b.id}><Block {...b}  /></td>
                         )}
                     </tr></tbody></table>
                 </div>

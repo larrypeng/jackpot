@@ -9,10 +9,13 @@
   color: white;
   background-color: rgb(206, 58, 66);
   margin-top: 3em;
+  max-height: 200px;
+  overflow: scroll;
 }
 
 .Message-body {
   font-size: 18px;
+  /* height: 300px; */
 }
 
 .Message-body:hover {

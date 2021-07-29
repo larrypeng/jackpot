@@ -13,6 +13,8 @@ npm init -y
 npm install express cors axios nodemon
 More information, use README file under JACKPOT/server/README.md
 
+Food for thought: A jQuery based jackpot machine. https://codepen.io/tangxuguo/pen/xqrNmx
+
 Message board shake effect: Credit goes to https://codepen.io/mcvazin/pen/bMOVPy
 
 # Future improvements/TODOs

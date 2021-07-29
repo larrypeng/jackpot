@@ -1,5 +1,8 @@
 ### To run the express based server app
 
+In root folder, use the following command to run the server
+npm start
+
 Use nodemon package, configured in package.json - scripts section
 nodemon index.js
 

@@ -6,12 +6,32 @@ class Message extends Component {
         return (
             <div className='Message'>
                 <h3>Message Board</h3>
-                {/* <div className='Message-body '>{this.props.msg}</div> */}
                 <div className={
+                    (this.props.shakeUp) ? 
+                    'Message-body shakeUp':
+                    'Message-body'
+                    }>Welcome to Jackpot! Click to shake me up
+                </div>
+
+                {
+                    this.props.msgs.map(msg => {
+                        return (
+                            <div>
+                            <p className={
                                 (this.props.shakeUp) ? 
                                 'Message-body shakeUp':
                                 'Message-body'
-                                }>{this.props.msg}</div>
+                                }>{msg}</p>
+                            </div>
+                        )
+                    })
+                }
+                    {/* <div className={
+                (this.props.shakeUp) ? 
+                'Message-body shakeUp':
+                'Message-body'
+                }>{this.props.msgs}</div>  */}
+
             </div>
         )
     }
